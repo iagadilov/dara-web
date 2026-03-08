@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { supabase } from '@/lib/supabase';
+import { getSupabase } from '@/lib/supabase';
 import type { Database } from '@/lib/database.types';
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
@@ -11,10 +11,10 @@ async function ensureAuth(): Promise<string | null> {
   if (!authPromise) {
     authPromise = (async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await getSupabase().auth.getSession();
         if (session?.user) return session.user.id;
 
-        const { data } = await supabase.auth.signInAnonymously();
+        const { data } = await getSupabase().auth.signInAnonymously();
         return data.user?.id ?? null;
       } catch {
         return null;
@@ -68,7 +68,7 @@ export const useAppStore = create<AppState>()(
         if (!uid) return;
 
         try {
-          const { data } = await supabase
+          const { data } = await getSupabase()
             .from('profiles')
             .select('*')
             .eq('id', uid)
@@ -87,7 +87,7 @@ export const useAppStore = create<AppState>()(
             });
           }
 
-          const { data: exercises } = await supabase
+          const { data: exercises } = await getSupabase()
             .from('completed_exercises')
             .select('exercise_id')
             .eq('user_id', uid);
@@ -108,7 +108,7 @@ export const useAppStore = create<AppState>()(
         if (!uid) return;
         set({ userId: uid });
 
-        const { error } = await supabase.from('profiles').upsert({
+        const { error } = await getSupabase().from('profiles').upsert({
           id: uid,
           goal,
           problem_sounds: sounds,
@@ -125,7 +125,7 @@ export const useAppStore = create<AppState>()(
         const uid = await ensureAuth();
         if (!uid) return;
 
-        const { error } = await supabase
+        const { error } = await getSupabase()
           .from('completed_exercises')
           .upsert({ user_id: uid, exercise_id: id }, { onConflict: 'user_id,exercise_id' });
         if (error) console.error('[Supabase] exercise upsert:', error.message);
@@ -142,7 +142,7 @@ export const useAppStore = create<AppState>()(
         const uid = await ensureAuth();
         if (!uid) return;
 
-        const { error } = await supabase
+        const { error } = await getSupabase()
           .from('profiles')
           .update({ streak: newStreak, last_session_date: today })
           .eq('id', uid);
