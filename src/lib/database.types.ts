@@ -48,6 +48,29 @@ export interface Database {
         };
         Relationships: [];
       };
+      reminders: {
+        Row: {
+          id: string;
+          telegram_id: number;
+          remind_hour: number;
+          timezone: string;
+          enabled: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          telegram_id: number;
+          remind_hour?: number;
+          timezone?: string;
+          enabled?: boolean;
+        };
+        Update: {
+          remind_hour?: number;
+          timezone?: string;
+          enabled?: boolean;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
