@@ -1,8 +1,9 @@
 import OpenAI from 'openai';
 
-const openai = new OpenAI();
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
+  const openai = new OpenAI();
   const formData = await req.formData();
   const audio = formData.get('audio') as File;
   const expectedText = formData.get('expectedText') as string;
