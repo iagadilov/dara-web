@@ -24,10 +24,8 @@ export async function POST(req: Request) {
   if (text === '/start') {
     await sendMessage(chatId,
       '👋 Привет! Я бот <b>Dara</b> — тренажёр дикции.\n\n' +
-      '🔔 Чтобы включить напоминания:\n' +
-      '<code>/remind 9</code> — напоминание в 9:00\n' +
-      '<code>/remind 20</code> — напоминание в 20:00\n\n' +
-      '❌ Отключить: <code>/stop</code>\n\n' +
+      '🔔 /remind — включить ежедневные напоминания (9:00)\n' +
+      '❌ /stop — отключить напоминания\n\n' +
       '🎯 Открой тренажёр:',
       {
         reply_markup: {
@@ -40,23 +38,15 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true });
   }
 
-  if (text.startsWith('/remind')) {
-    const parts = text.split(/\s+/);
-    const hour = parseInt(parts[1], 10);
-
-    if (isNaN(hour) || hour < 0 || hour > 23) {
-      await sendMessage(chatId, '⚠️ Укажи час от 0 до 23. Пример: <code>/remind 9</code>');
-      return NextResponse.json({ ok: true });
-    }
-
+  if (text === '/remind') {
     const supabase = getSupabase();
     await supabase.from('reminders').upsert(
-      { telegram_id: telegramId, remind_hour: hour, enabled: true },
+      { telegram_id: telegramId, enabled: true },
       { onConflict: 'telegram_id' },
     );
 
     await sendMessage(chatId,
-      `✅ Напоминание установлено на <b>${hour}:00</b> каждый день.\n\nОтключить: /stop`,
+      '✅ Ежедневные напоминания включены! Буду писать каждое утро.\n\nОтключить: /stop',
     );
     return NextResponse.json({ ok: true });
   }
@@ -68,12 +58,12 @@ export async function POST(req: Request) {
       .update({ enabled: false })
       .eq('telegram_id', telegramId);
 
-    await sendMessage(chatId, '🔕 Напоминания отключены. Включить снова: <code>/remind 9</code>');
+    await sendMessage(chatId, '🔕 Напоминания отключены. Включить снова: /remind');
     return NextResponse.json({ ok: true });
   }
 
   await sendMessage(chatId,
-    'Команды:\n/remind 9 — напоминание в 9:00\n/stop — отключить напоминания',
+    'Команды:\n/remind — включить напоминания\n/stop — отключить напоминания',
   );
   return NextResponse.json({ ok: true });
 }

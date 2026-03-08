@@ -21,54 +21,38 @@ export async function GET(req: Request) {
 
   const supabase = getSupabase();
 
-  const now = new Date();
-  const currentHourUTC = now.getUTCHours();
-
   const { data: reminders } = await supabase
     .from('reminders')
-    .select('telegram_id, remind_hour, timezone')
+    .select('telegram_id')
     .eq('enabled', true);
 
   if (!reminders || reminders.length === 0) {
     return NextResponse.json({ sent: 0 });
   }
 
+  const dayIndex = new Date().getDay() || 7;
+  const daySchedule = SCHEDULE[(dayIndex - 1) % SCHEDULE.length];
+  const randomMsg = MESSAGES[Math.floor(Math.random() * MESSAGES.length)];
+
   let sent = 0;
 
   for (const r of reminders) {
-    const localHour = getLocalHour(currentHourUTC, r.timezone);
-    if (localHour !== r.remind_hour) continue;
-
-    const dayIndex = now.getDay() || 7;
-    const daySchedule = SCHEDULE[(dayIndex - 1) % SCHEDULE.length];
-    const randomMsg = MESSAGES[Math.floor(Math.random() * MESSAGES.length)];
-
-    await sendMessage(r.telegram_id,
-      `${randomMsg}\n\n📅 Сегодня: <b>${daySchedule.title}</b>`,
-      {
-        reply_markup: {
-          inline_keyboard: [[
-            { text: '🏋️ Начать тренировку', web_app: { url: 'https://dara-iota.vercel.app' } }
-          ]],
+    try {
+      await sendMessage(r.telegram_id,
+        `${randomMsg}\n\n📅 Сегодня: <b>${daySchedule.title}</b>`,
+        {
+          reply_markup: {
+            inline_keyboard: [[
+              { text: '🏋️ Начать тренировку', web_app: { url: 'https://dara-iota.vercel.app' } }
+            ]],
+          },
         },
-      },
-    );
-    sent++;
+      );
+      sent++;
+    } catch {
+      // user may have blocked the bot
+    }
   }
 
   return NextResponse.json({ sent });
-}
-
-function getLocalHour(utcHour: number, timezone: string): number {
-  try {
-    const now = new Date();
-    const formatter = new Intl.DateTimeFormat('en-US', {
-      hour: 'numeric',
-      hour12: false,
-      timeZone: timezone,
-    });
-    return parseInt(formatter.format(now), 10);
-  } catch {
-    return (utcHour + 5) % 24; // fallback: Asia/Almaty = UTC+5
-  }
 }
