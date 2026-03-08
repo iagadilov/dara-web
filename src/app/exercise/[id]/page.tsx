@@ -8,6 +8,7 @@ import { ExerciseTimer } from '@/components/ExerciseTimer';
 import { AudioRecorder } from '@/components/AudioRecorder';
 import { Diagram } from '@/components/ArticulationDiagram';
 import { Button } from '@/components/ui/button';
+import { TelegramBackButton } from '@/components/TelegramBackButton';
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 
 type Phase = 'steps' | 'diagram' | 'record';
@@ -74,6 +75,7 @@ export default function ExercisePage() {
 
   return (
     <div className="flex flex-col gap-6">
+      <TelegramBackButton />
       {/* Header */}
       <div className="flex items-center gap-3">
         <button

@@ -6,6 +6,7 @@ import { useAppStore } from '@/store/useAppStore';
 import { EXERCISES } from '@/data/exercises';
 import { SCHEDULE } from '@/data/schedule';
 import { StreakBadge } from '@/components/StreakBadge';
+import { TelegramBackButton } from '@/components/TelegramBackButton';
 import { ArrowLeft, Check, Circle } from 'lucide-react';
 
 export default function ProgressPage() {
@@ -26,6 +27,7 @@ export default function ProgressPage() {
 
   return (
     <div className="flex flex-col gap-6">
+      <TelegramBackButton />
       {/* Header */}
       <div className="flex items-center gap-3">
         <Link

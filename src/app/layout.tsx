@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { ServiceWorkerRegistrar } from '@/components/ServiceWorkerRegistrar';
 import { AppInitializer } from '@/components/AppInitializer';
+import { TelegramProvider } from '@/components/TelegramProvider';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -28,10 +29,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ru" className="dark">
+      <head>
+        <script src="https://telegram.org/js/telegram-web-app.js" />
+      </head>
       <body className="min-h-dvh antialiased">
-        <main className="mx-auto max-w-md px-4 py-6">{children}</main>
-        <AppInitializer />
-        <ServiceWorkerRegistrar />
+        <TelegramProvider>
+          <main className="mx-auto max-w-md px-4 py-6">{children}</main>
+          <AppInitializer />
+          <ServiceWorkerRegistrar />
+        </TelegramProvider>
       </body>
     </html>
   );
