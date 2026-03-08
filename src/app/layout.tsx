@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { ServiceWorkerRegistrar } from '@/components/ServiceWorkerRegistrar';
+import { AppInitializer } from '@/components/AppInitializer';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -29,6 +30,7 @@ export default function RootLayout({
     <html lang="ru" className="dark">
       <body className="min-h-dvh antialiased">
         <main className="mx-auto max-w-md px-4 py-6">{children}</main>
+        <AppInitializer />
         <ServiceWorkerRegistrar />
       </body>
     </html>

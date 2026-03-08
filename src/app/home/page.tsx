@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/store/useAppStore';
 import { EXERCISES, SOUND_COLORS, type SoundId } from '@/data/exercises';
 import { SCHEDULE } from '@/data/schedule';
@@ -11,7 +12,8 @@ import { Button } from '@/components/ui/button';
 import { Check, Circle, Clock, ArrowRight } from 'lucide-react';
 
 export default function HomePage() {
-  const { completedExercises, updateStreak, getProgramDay } = useAppStore();
+  const router = useRouter();
+  const { completedExercises, updateStreak, getProgramDay, onboardingDone } = useAppStore();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -19,7 +21,13 @@ export default function HomePage() {
     updateStreak();
   }, [updateStreak]);
 
-  if (!mounted) return null;
+  useEffect(() => {
+    if (mounted && !onboardingDone) {
+      router.replace('/onboarding');
+    }
+  }, [mounted, onboardingDone, router]);
+
+  if (!mounted || !onboardingDone) return null;
 
   const today = SCHEDULE[getProgramDay() - 1];
   const exercises = today.exerciseIds
