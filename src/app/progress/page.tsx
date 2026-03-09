@@ -61,9 +61,10 @@ export default function ProgressPage() {
           {weekData.map((day) => {
             const allDone = day.done === day.total;
             return (
-              <div
+              <Link
                 key={day.day}
-                className={`flex items-center gap-3 rounded-2xl bg-card p-4 ${
+                href={`/day/${day.day}`}
+                className={`flex items-center gap-3 rounded-2xl bg-card p-4 transition-colors hover:bg-card/80 ${
                   allDone ? 'opacity-60' : ''
                 }`}
               >
@@ -81,7 +82,7 @@ export default function ProgressPage() {
                 ) : (
                   <Circle className="h-4 w-4 text-muted-foreground" />
                 )}
-              </div>
+              </Link>
             );
           })}
         </div>
